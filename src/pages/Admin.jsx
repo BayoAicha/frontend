@@ -7,6 +7,8 @@ export default function Admin() {
   const [user, setUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [emprunts, setEmprunts] = useState([]);
+  const [searchUser, setSearchUser] = useState("");
+  const [searchLivre, setSearchLivre] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,11 +53,35 @@ export default function Admin() {
   }
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl text-green-500 font-bold mb-6">Espace Administrateur</h1>
-      <p className="text-white mb-8">
+    <div className="p-8 bg-white">
+      <h1 className="text-3xl text-green-500 font-bold mb-6">Espace de gestion des utilisateurs et des emprunts</h1>
+      <p className="text-black bold mb-8">
         Bienvenue, {user.nom}. Vous êtes connecté(e) en tant qu’administrateur.
       </p>
+
+      {/* Filtres de recherche globaux */}
+      <div className="flex flex-col md:flex-row md:items-end md:space-x-4 mb-8">
+        <div className="flex flex-col mb-2 md:mb-0">
+          <label className="text-black font-bold mb-1">Utilisateur (nom ou email)</label>
+          <input
+            type="text"
+            value={searchUser}
+            onChange={e => setSearchUser(e.target.value)}
+            placeholder="Rechercher utilisateur..."
+            className="px-3 py-2 rounded bg-gray-200 text-black"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label className="text-black font-bold mb-1">Livre (titre)</label>
+          <input
+            type="text"
+            value={searchLivre}
+            onChange={e => setSearchLivre(e.target.value)}
+            placeholder="Rechercher livre..."
+            className="px-3 py-2 rounded bg-gray-200 text-black"
+          />
+        </div>
+      </div>
 
       {/*  Liste des utilisateurs */}
       <h2 className="text-2xl text-blue-400 mb-4">👥 Utilisateurs</h2>
@@ -87,7 +113,7 @@ export default function Admin() {
       </div>
 
       {/* Liste des emprunts */}
-      <h2 className="text-2xl text-blue-400 mb-4">📚 Emprunts</h2>
+      <h2 className="text-2xl text-blue-400 mb-4"> Emprunts</h2>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-white border-collapse">
           <thead>
@@ -103,22 +129,23 @@ export default function Admin() {
             </tr>
           </thead>
           <tbody>
-            {emprunts.map((e) => (
-              <tr key={e.id} className="border-b border-gray-700">
-                <td className="p-2">{e.id}</td>
-                <td className="p-2">{e.utilisateur}</td>
-                <td className="p-2">{e.email}</td>
-                <td className="p-2">{e.titre}</td>
-                <td className="p-2">{e.auteur}</td>
-                <td className="p-2">
-                  {new Date(e.date_emprunt).toLocaleDateString()}
-                </td>
-                <td className="p-2">
-                  {e.date_retour ? new Date(e.date_retour).toLocaleDateString() : "N/A"}
-                </td>
-                <td className="p-2">{e.retour ? "✅" : "❌"}</td>
-              </tr>
-            ))}
+            {emprunts
+              .filter(e =>
+                (searchUser === "" || (e.utilisateur && e.utilisateur.toLowerCase().includes(searchUser.toLowerCase())) || (e.email && e.email.toLowerCase().includes(searchUser.toLowerCase()))) &&
+                (searchLivre === "" || (e.titre && e.titre.toLowerCase().includes(searchLivre.toLowerCase())))
+              )
+              .map((e) => (
+                <tr key={e.id} className="border-b border-gray-700">
+                  <td className="p-2">{e.id}</td>
+                  <td className="p-2">{e.utilisateur}</td>
+                  <td className="p-2">{e.email}</td>
+                  <td className="p-2">{e.titre}</td>
+                  <td className="p-2">{e.auteur}</td>
+                  <td className="p-2">{new Date(e.date_emprunt).toLocaleDateString()}</td>
+                  <td className="p-2">{e.date_retour ? new Date(e.date_retour).toLocaleDateString() : "N/A"}</td>
+                  <td className="p-2">{e.retour ? "✅" : "❌"}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

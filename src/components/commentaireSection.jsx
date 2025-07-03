@@ -30,10 +30,9 @@ export default function CommentaireSection({ livreId, user }) {
       await axios.post(
         `http://localhost:5000/api/commentaires`,
         {
-          user_id: decoded.id,
           livre_id: livreId,
           note,
-          comment,
+          commentaire: comment,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -41,7 +40,11 @@ export default function CommentaireSection({ livreId, user }) {
       setComment("");
       fetchCommentaires();
     } catch (err) {
-      console.error(err);
+      console.error("Erreur Axios:", err);
+      if (err.response) {
+        console.error("Réponse backend:", err.response.data);
+        alert(JSON.stringify(err.response.data));
+      }
     }
   };
 
@@ -51,9 +54,25 @@ export default function CommentaireSection({ livreId, user }) {
       {commentaires.length === 0 && <p className="text-gray-400">Aucun commentaire.</p>}
       <ul className="text-white mb-2">
         {commentaires.map((c) => (
-          <li key={c.id} className="border-b border-gray-700 pb-2 mb-2">
-            <p className="font-semibold">{c.utilisateur} ({c.note}/5)</p>
-            <p>{c.comment}</p>
+          <li key={c.id} className="flex items-start space-x-3 border-b border-gray-700 pb-3 mb-3">
+            {/* Avatar cercle avec initiale */}
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-700 flex items-center justify-center text-xl font-bold text-white">
+              {c.utilisateur ? c.utilisateur[0].toUpperCase() : '?'}
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center space-x-2">
+                <span className="font-semibold text-green-400">{c.utilisateur}</span>
+                {/* Note en étoiles */}
+                <span className="text-yellow-400">
+                  {c.note ? '★'.repeat(c.note) + '☆'.repeat(5 - c.note) : ''}
+                </span>
+                {/* Date si disponible */}
+                {c.crée_le && (
+                  <span className="text-xs text-gray-400 ml-2">{new Date(c.crée_le).toLocaleDateString()}</span>
+                )}
+              </div>
+              <p className="mt-1 text-gray-200">{c.commentaire || c.comment}</p>
+            </div>
           </li>
         ))}
       </ul>

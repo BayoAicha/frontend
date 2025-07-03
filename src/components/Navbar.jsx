@@ -1,56 +1,100 @@
-import { NavLink, Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
 
 export default function Navbar() {
-  const linkBase = "text-white hover:text-green-400 transition px-2 py-1";
-  const activeStyle = "border-b-2 border-green-500 text-green-400";
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  // Vérifie le token à chaque changement de page
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUser(decoded);
+      } catch {
+        setUser(null);
+      }
+    } else {
+      setUser(null);
+    }
+  }, [location.pathname]);
+
+  // Déconnexion
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    navigate("/");
+  };
+
+  // Lien actif → souligné + fond jaune
+  const linkClass = (path) =>
+    `px-3 py-1 rounded ${
+      location.pathname === path
+        ? "bg-yellow-700 text-white underline"
+        : "text-white hover:text-yellow-400"
+    } transition`;
 
   return (
-    <nav className="bg-black px-6 py-4 flex items-center justify-between shadow-md">
+    <nav className="bg-green-600 px-6 py-4 flex items-center justify-between shadow-md">
       <div className="text-white text-2xl font-bold">
         Ma Bibliothèque
       </div>
-      <div className="space-x-4">
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            isActive ? `${linkBase} ${activeStyle}` : linkBase
-          }
-        >
+
+      <div className="space-x-4 flex items-center">
+        <Link to="/" className={linkClass("/")}>
           Accueil
-        </NavLink>
-
-        <NavLink
-          to="/books"
-          className={({ isActive }) =>
-            isActive ? `${linkBase} ${activeStyle}` : linkBase
-          }
-        >
+        </Link>
+        <Link to="/books" className={linkClass("/books")}>
           Livres
-        </NavLink>
-
-        <NavLink
-          to="/emprunts"
-          className={({ isActive }) =>
-            isActive ? `${linkBase} ${activeStyle}` : linkBase
-          }
-        >
-          Mes emprunts
-        </NavLink>
-
-        {/* les boutons Connexion & Inscription en style boutons */}
-        <Link
-          to="/login"
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-        >
-          Connexion
         </Link>
 
-        <Link
-          to="/register"
-          className="border border-green-600 text-green-600 px-4 py-2 rounded hover:bg-green-600 hover:text-white transition"
-        >
-          Inscription
-        </Link>
+        {/*  Mes emprunts pour étudiants uniquement */}
+        {user?.role !== "admin" && user && (
+          <Link to="/emprunts" className={linkClass("/emprunts")}>
+            Mes emprunts
+          </Link>
+        )}
+
+        {/*  Espace Admin pour admin uniquement */}
+        {user?.role === "admin" && (
+          <Link to="/admin" className={linkClass("/admin")}>
+            Gestion utilisateurs
+            et emprunts
+          </Link>
+        )}
+
+        {/*  Profil + Déconnexion si connecté */}
+        {user ? (
+          <>
+            <Link to="/profil" className={linkClass("/profil")}>
+              Profil
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+            >
+              Déconnexion
+            </button>
+          </>
+        ) : (
+          <>
+            <Link
+              to="/login"
+              className="bg-white text-black px-4 py-2 rounded hover:bg-yellow-700 transition"
+            >
+              Connexion
+            </Link>
+            <Link
+              to="/register"
+              className="bg-white border border-yellow-600 text-black px-4 py-2 rounded hover:bg-yellow-600 hover:text-white transition"
+            >
+              Inscription
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );

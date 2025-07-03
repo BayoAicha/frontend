@@ -7,7 +7,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
-  // Vérifie le token à chaque changement de page
+  // Vérification du token à chaque changement de page
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -36,11 +36,19 @@ export default function Navbar() {
         ? "bg-yellow-700 text-white underline"
         : "text-white hover:text-yellow-400"
     } transition`;
+    // Classe pour les liens de navigation
+    // Utilisation de Tailwind CSS pour le style
+    // Utilisation de la classe `transition` pour les effets de survol
 
   return (
     <nav className="bg-green-600 px-6 py-4 flex items-center justify-between shadow-md">
-      <div className="text-white text-2xl font-bold">
-        Ma Bibliothèque
+      <div className="flex items-center gap-3">
+        <img
+          src="/Mabiblio.png"
+          alt="Logo Ma Bibliothèque"
+          className="w-12 h-12 rounded-full object-cover border-2 border-white shadow"
+        />
+        <span className="text-white text-2xl font-bold">MaBibliothèque</span>
       </div>
 
       <div className="space-x-4 flex items-center">

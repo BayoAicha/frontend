@@ -47,18 +47,7 @@ export default function Admin() {
         setUsers(usersRes.data);
         setEmprunts(empruntsRes.data);
       } catch (err) {
-        if (
-          err.response &&
-          err.response.status === 403 &&
-          err.response.data &&
-          (err.response.data.message?.toLowerCase().includes("token") ||
-            err.response.data.error?.toLowerCase().includes("token"))
-        ) {
-          alert("Votre session a expiré. Veuillez vous reconnecter.");
-          navigate("/login");
-        } else {
-          console.error(err);
-        }
+        console.error(err);
       }
     };
 
@@ -101,7 +90,7 @@ export default function Admin() {
       </div>
 
       {/*  Liste des utilisateurs */}
-      <h2 className="text-2xl text-blue-400  mb-4">👥 Utilisateurs</h2>
+      <h2 className="text-2xl text-blue-400 mb-4">👥 Utilisateurs</h2>
       <div className="overflow-x-auto mb-8">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -152,11 +141,11 @@ export default function Admin() {
               .map((e) => (
                 <tr key={e.id} className="border-b border-gray-700">
                   <td className="p-2 font-bold text-black">{e.id}</td>
-                  <td className="p-2 font-bold text-black">{e.utilisateur || ""}</td>
-                  <td className="p-2 font-bold text-black">{e.email || ""}</td>
-                  <td className="p-2 font-bold text-black">{e.titre || ""}</td>
-                  <td className="p-2 font-bold text-black">{e.auteur || ""}</td>
-                  <td className="p-2 font-bold text-black">{e.date_emprunt ? new Date(e.date_emprunt).toLocaleDateString() : ""}</td>
+                  <td className="p-2 font-bold text-black">{e.utilisateur}</td>
+                  <td className="p-2 font-bold text-black">{e.email}</td>
+                  <td className="p-2 font-bold text-black">{e.titre}</td>
+                  <td className="p-2 font-bold text-black">{e.auteur}</td>
+                  <td className="p-2 font-bold text-black">{new Date(e.date_emprunt).toLocaleDateString()}</td>
                   <td className="p-2 font-bold text-black">{e.date_retour ? new Date(e.date_retour).toLocaleDateString() : "N/A"}</td>
                   <td className="p-2 font-bold text-black">{e.retour ? "✅" : "❌"}</td>
                 </tr>

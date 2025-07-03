@@ -6,7 +6,8 @@ import Emprunts from "./pages/Emprunts";
 import Livres from "./pages/Livres";
 import Maison from "./pages/Maison";
 import Profil from "./pages/Profil";
-import Admin from "./pages/Admin"; // ✅ nouveau
+import Admin from "./pages/Admin"; 
+//  importation des composants de pages
 
 function App() {
   return (
@@ -27,5 +28,7 @@ function App() {
     </div>
   );
 }
+//  Composant principal de l'application
+//   barre de navigation et les routes de l'application
 
 export default App;

@@ -1,4 +1,4 @@
-// Patch pour LoginForm.jsx : redirige automatiquement vers l'accueil après connexion
+//  redirirection automatiquement vers l'accueil après connexion
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +8,9 @@ export default function LoginForm() {
   const [mot_de_passe, setMotDePasse] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  // Fonction pour gérer la soumission du formulaire de connexion
+  // Envoie une requête POST à l'API pour se connecter
+  // Si la connexion réussit, stocke le token dans le localStorage
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,7 +19,7 @@ export default function LoginForm() {
         email,
         mot_de_passe,
       });
-      setMessage("✅ Connexion réussie !");
+      setMessage(" Connexion réussie !");
       localStorage.setItem("token", res.data.token);
       setEmail("");
       setMotDePasse("");
@@ -24,7 +27,7 @@ export default function LoginForm() {
         navigate("/");
       }, 800); // Redirection après 0.8s
     } catch (err) {
-      setMessage("❌ Échec de la connexion");
+      setMessage(" Échec de la connexion");
     }
   };
 

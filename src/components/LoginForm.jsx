@@ -10,15 +10,19 @@ export default function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Envoie une requête POST à l'API pour se connecter
+    // Si la connexion réussit, stocke le token dans le localStorage
+    // Si la connexion échoue, affiche un message d'erreur
+    // Redirige l'utilisateur vers la page d'accueil après 0.8s
 
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", {
         email,
-        mot_de_passe, // <-- Correction ici
+        mot_de_passe, // se Connecter
       });
 
       console.log(res.data);
-      setMessage("✅ Connexion réussie !");
+      setMessage(" Connexion réussie !!!");
       localStorage.setItem("token", res.data.token);
 
       setEmail("");
@@ -28,7 +32,7 @@ export default function LoginForm() {
       }, 800); // Redirection après 0.8s
     } catch (err) {
       console.error(err);
-      setMessage("❌ Échec de la connexion");
+      setMessage(" Échec de la connexion");
     }
   };
 

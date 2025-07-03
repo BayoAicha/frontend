@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
+import NotificationsBloc from "../components/NotificationsBloc";
+// Composant pour afficher le profil utilisateur
+// Affiche les informations de l'utilisateur connecté
 
 export default function Profil() {
   const [user, setUser] = useState(null);
@@ -23,6 +26,8 @@ export default function Profil() {
       </div>
     );
   }
+  // Si l'utilisateur n'est pas connecté, affichage d' un message
+  
 
   return (
     <div className="flex flex-col bg-white items-center justify-center min-h-[calc(100vh-4rem)] p-8">
@@ -42,6 +47,20 @@ export default function Profil() {
         <p><span className="font-bold">Email :</span> {user.email}</p>
         <p><span className="font-bold">Connecté(e) en tant que :</span> {user.role}</p>
       </div>
+      {/* Bloc d'information pour les étudiants */}
+      {user.role !== "admin" && (
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-900 p-4 mt-6 w-full max-w-md rounded shadow">
+          <span>
+            Connectez-vous comme administrateur pour pouvoir
+            <span className="font-bold"> Ajouter</span>,
+            <span className="font-bold"> Modifier</span>,
+            <span className="font-bold"> Supprimer</span> et
+            <span className="font-bold"> Gérer</span> des livres, gérer les utilisateurs et les emprunts.<br/> Adresse mail d'un administrateur : admin@mail.com <br/> mot de passe de l'administrateur : motdepasseadmin
+          </span>
+        </div>
+      )}
+      {/* Bloc notifications */}
+      <NotificationsBloc />
     </div>
   );
 }

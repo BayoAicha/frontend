@@ -1,18 +1,16 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 import CommentaireSection from "./commentaireSection";
 
 export default function LivresListe() {
   const [livres, setLivres] = useState([]);
-  // Gestion des messages avec type (succès/erreur)
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState(null); // 'success' | 'error' | null
   const [titre, setTitre] = useState("");
   const [auteur, setAuteur] = useState("");
   const [genre, setGenre] = useState("");
-  const [genresOptions, setGenresOptions] = useState([]);
-  const [auteursOptions, setAuteursOptions] = useState([]);
   const [user, setUser] = useState(null);
   const [newTitre, setNewTitre] = useState("");
   const [newAuteur, setNewAuteur] = useState("");
@@ -26,6 +24,7 @@ export default function LivresListe() {
   const [livreCommentaires, setLivreCommentaires] = useState([]);
   const [moyenneEtoiles, setMoyenneEtoiles] = useState(null);
   const messageRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -39,43 +38,46 @@ export default function LivresListe() {
     }
   }, []);
 
-  const fetchFiltres = useCallback(async () => {
+  // Déclaration de fetchLivres pour qu'il soit accessible dans tout le composant
+  const fetchLivres = async () => {
     try {
-      const params = {};
-      if (titre) params.titre = titre;
-      if (auteur) params.auteur = auteur;
-      if (genre) params.genre = genre;
-      const res = await axios.get("http://localhost:5000/api/livres/filtres", { params });
-      setGenresOptions(res.data.genres);
-      setAuteursOptions(res.data.auteurs);
-    } catch (err) {
-      console.error(err);
-    }
-  }, [titre, auteur, genre]);
-
-  const fetchLivres = useCallback(async () => {
-    try {
-      const params = {};
-      if (titre) params.titre = titre;
-      if (auteur) params.auteur = auteur;
-      if (genre) params.genre = genre;
-      const res = await axios.get("http://localhost:5000/api/livres", { params });
+      const res = await axios.get("http://localhost:5000/api/livres");
       setLivres(res.data);
     } catch (err) {
-      console.error(err);
+      if (
+        err.response &&
+        err.response.status === 403 &&
+        err.response.data &&
+        (err.response.data.message?.toLowerCase().includes("token") ||
+          err.response.data.error?.toLowerCase().includes("token"))
+      ) {
+        alert("Votre session a expiré. Veuillez vous reconnecter.");
+        navigate("/login");
+      } else {
+        console.error(err);
+      }
     }
-  }, [titre, auteur, genre]);
+  };
 
+  // Nouvelle logique : charger tous les livres une seule fois
   useEffect(() => {
     fetchLivres();
-    fetchFiltres();
     // Rafraîchissement auto toutes les 20 secondes
-    const interval = setInterval(() => {
-      fetchLivres();
-      fetchFiltres();
-    }, 20000);
+    const interval = setInterval(fetchLivres, 20000);
     return () => clearInterval(interval);
-  }, [fetchLivres, fetchFiltres]);
+  }, [navigate]);
+
+  // Générer dynamiquement les options triées à partir des livres
+  const auteursOptions = Array.from(new Set(livres.map((l) => l.auteur).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+  const genresOptions = Array.from(new Set(livres.map((l) => l.genre).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+
+  // Filtrage local côté client
+  const livresFiltres = livres.filter(
+    (l) =>
+      (titre ? l.titre.toLowerCase().includes(titre.toLowerCase()) : true) &&
+      (auteur ? l.auteur === auteur : true) &&
+      (genre ? l.genre === genre : true)
+  );
 
   const resetFiltres = () => {
     setTitre("");
@@ -85,7 +87,8 @@ export default function LivresListe() {
     setMessageType(null);
   };
 
-  // Affichage et disparition automatique du message
+  // Affichage et disparition automatique du message aprsès 3 secondes
+  // Fonction pour afficher un message temporaire
   const showMessage = (msg, type = null) => {
     setMessage(msg);
     setMessageType(type);
@@ -93,7 +96,7 @@ export default function LivresListe() {
       setMessage("");
       setMessageType(null);
     }, 3000);
-    // Scroll vers le message si possible
+    // Scroll vers le message 
     if (messageRef.current) {
       messageRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
     }
@@ -117,7 +120,6 @@ export default function LivresListe() {
       );
       showMessage("Livre emprunté avec succès !", "success");
       fetchLivres();
-      fetchFiltres();
     } catch (err) {
       if (err.response) {
         showMessage(err.response.data.message || "Erreur lors de l'emprunt.", "error");
@@ -126,6 +128,7 @@ export default function LivresListe() {
       }
     }
   };
+  // Fonction pour charger les commentaires et calculer la moyenne d'étoiles d'un livre
 
   const handleAjouterLivre = async () => {
     const token = localStorage.getItem("token");
@@ -141,7 +144,6 @@ export default function LivresListe() {
       setNewAuteur("");
       setNewGenre("");
       fetchLivres();
-      fetchFiltres();
     } catch (err) {
       showMessage("Erreur lors de l'ajout du livre.", "error");
     }
@@ -156,7 +158,6 @@ export default function LivresListe() {
       });
       showMessage("Livre supprimé avec succès !", "success");
       fetchLivres();
-      fetchFiltres();
     } catch (err) {
       showMessage("Erreur lors de la suppression du livre.", "error");
     }
@@ -187,7 +188,6 @@ export default function LivresListe() {
       showMessage("Livre modifié avec succès !", "success");
       setEditingId(null);
       fetchLivres();
-      fetchFiltres();
     } catch (err) {
       showMessage("Erreur lors de la modification du livre.", "error");
     }
@@ -211,12 +211,23 @@ export default function LivresListe() {
     }
   };
 
-  // Images de fond disponibles (chemins encodés pour les espaces)
+  // Images de fond pour les livres
   const imagesBackground = [
     "/petit%20prince.jpeg",
     "/enfant%20noir.jpeg",
     "/bird.jpeg",
-    "/soleil.jpeg"
+    "/alla.jpg",
+    "/Bell.jpg",
+    "/miserable.jpg",
+    "/obligé.jpg",
+    "/poter.jpg",
+    "/snow.jpg",
+    "/year.jpg",
+    "/Gone.jpg",
+    "/dragon.jpg",
+    "/soleil.jpeg",
+    "/hell.jpg",
+    "/rouge.jpg",
   ];
 
   return (
@@ -281,7 +292,7 @@ export default function LivresListe() {
         </div>
         <div className="flex space-x-2 mt-4 md:mt-0">
           <button
-            onClick={() => { fetchLivres(); fetchFiltres(); }}
+            onClick={() => { }}
             className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold shadow"
           >
             Filtrer
@@ -297,8 +308,8 @@ export default function LivresListe() {
 
       {/* Résultats filtrés */}
       <div className="mb-4">
-        {livres.length > 0 ? (
-          <span className="text-sm text-black font-bold">{livres.length} livre{livres.length > 1 ? 's' : ''} trouvé{livres.length > 1 ? 's' : ''}</span>
+        {livresFiltres.length > 0 ? (
+          <span className="text-sm text-black font-bold">{livresFiltres.length} livre{livresFiltres.length > 1 ? 's' : ''} trouvé{livresFiltres.length > 1 ? 's' : ''}</span>
         ) : (
           <span className="text-red-400 font-bold">Aucun livre ne correspond à vos filtres.</span>
         )}
@@ -319,8 +330,8 @@ export default function LivresListe() {
 
       {/* Liste livres */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {livres.map((livre, idx) => {
-          // Attribution cyclique des images pour tous les livres
+        {livresFiltres.map((livre, idx) => {
+          // Attribution  des images pour tous les livres
           const bgImage = imagesBackground[idx % imagesBackground.length];
           return (
             <div

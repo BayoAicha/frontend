@@ -14,20 +14,25 @@ export default function RegisterForm() {
       const res = await axios.post("http://localhost:5000/api/auth/register", {
         nom,
         email,
-        mot_de_passe, // <-- Correction ici
+        mot_de_passe, //  Correction ici
       });
 
       console.log(res.data);
-      setMessage(" Inscription réussie !");
+      setMessage(" Inscription réussie!!!");
       // Efface les champs après succès
       setNom("");
       setEmail("");
       setMotDePasse("");
     } catch (err) {
       console.error(err);
-      setMessage("❌ Impossible de s'inscrire !");
+      setMessage(" Impossible de s'inscrire !");
     }
   };
+  //  Formulaire d'inscription
+  //  Utilisation de Tailwind CSS pour le style
+  //  Utilisation de Axios pour les requêtes HTTP
+  //  Utilisation de useState pour gérer l'état local
+  //  Utilisation de useEffect pour les effets de bord (non utilisé ici mais utile pour des appels API)
 
   return (
     <form

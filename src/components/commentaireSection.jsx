@@ -7,7 +7,10 @@ export default function CommentaireSection({ livreId, user }) {
   const [note, setNote] = useState(3);
   const [comment, setComment] = useState("");
 
-  // Correction : useCallback pour la fonction
+  // Utilisation de useCallback pour la fonction
+  // fetchCommentaires afin de ne pas la recréer à chaque rendu
+  // Utilisation de useCallback pour la fonction
+  // fetchCommentaires afin de ne pas la recréer à chaque rendu
   const fetchCommentaires = useCallback(async () => {
     try {
       const res = await axios.get(`http://localhost:5000/api/commentaires/${livreId}`);

@@ -1,70 +1,145 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+#  MaBibliothèque
 
-## Available Scripts
+Ce projet est une application web de gestion de bibliothèque universitaire.
+Elle permet aux étudiants d'emprunter des livres, de laisser des commentaires,
+et aux administrateurs de gérer les livres, les utilisateurs et les emprunts.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+##  Fonctionnalités principales
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+✅ Authentification (Inscription, Connexion, Déconnexion)  
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+✅ Espace étudiant :
+- Consulter la liste des livres sur la page Livres
+- Filtrer les livres par titre, auteur ou genre
+- Emprunter des livres disponibles
+- Laisser des commentaires et des notes sur les livres en cliquant sur    les nom des livres.
+- Voir ses emprunts sur la page Emprunts
 
-### `npm test`
+✅ Espace administrateur :
+- Ajouter, modifier et supprimer des livres sur la page Livres
+- Voir la liste de tous les utilisateurs sur la page Gestion utilisateurs et emprunts
+- Voir tous les emprunts en cours ou terminés sur la page Gestions utilisateurs et emprunts
+- Filtrer et rechercher les emprunts 
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## 🗂️ Structure du projet
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+📁 backend/
+  ├─ config/
+  ├─ controllers/
+  ├─ middleware/
+  ├─ routes/
+  ├─ server.js
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+📁 frontend/
+  ├─ src/
+      ├─ components/
+      ├─ pages/
+      ├─ App.js
+      ├─ index.js
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## ⚙️ Technologies utilisées
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- **Backend** : Node.js, Express, MySQL
+- **Frontend** : React.js, Axios, Tailwind CSS
+- **Sécurité** : JWT pour l’authentification
+- **Base de données** : MySQL
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+##  Installation
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 1️⃣ Cloner le projet
+```bash
+git clone https://github.com/votre-utilisateur/votre-repo.git
+cd votre-repo
+```
 
-## Learn More
+### 2️⃣ Installer les dépendances backend
+```bash
+cd backend
+npm install
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 3️⃣ Configurer la base de données
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- Créer une base de données **bibliotheque**
+- Importer les tables :
+  - `utilisateurs`
+  - `livres`
+  - `emprunts`
+  - `commentaires`
+- Mettre à jour les infos de connexion dans `backend/config/db.js` :
+  ```js
+  const db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "bibliotheque",
+  });
+  ```
 
-### Code Splitting
+- Créer un fichier `.env` :
+  ```
+  JWT_SECRET=tonsecretici
+  ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### 4️⃣ Lancer le backend
+```bash
+npm start
+```
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### 5️⃣ Installer les dépendances frontend
+```bash
+cd ../frontend
+npm install
+```
 
-### Making a Progressive Web App
+### 6️⃣ Lancer le frontend
+```bash
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 🗝️ Connexion par défaut
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- **Exemple d'administrateur** : admin@gmail.com
+ **Mot de passe administrateur** : motdepasseadmin 
 
-### Deployment
+- **Exmple d'Étudiant** : sylvain@example.com
+- **Mot de passe etudiant**: secret123
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-### `npm run build` fails to minify
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 📌 Routes principales
+
+- `/api/auth/register` → Inscription
+- `/api/auth/login` → Connexion
+- `/api/livres` → Liste des livres
+- `/api/emprunts` → Emprunts d’un utilisateur
+- `/api/admin/users` → Liste utilisateurs (administrateur)
+- `/api/admin/emprunts` → Liste emprunts (admininstrateur)
+- `/api/commentaires` → Commentaires d’un livre
+
+
+---
+
+## 💡 Auteure
+
+- **BAYO Aïchatou**
+- 2ie
+- Contact : aichadjaridbayo@gmail.com
+
+
